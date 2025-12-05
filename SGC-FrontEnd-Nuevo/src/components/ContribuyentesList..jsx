@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Edit, Trash2, Building2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { EditContribuyenteModal } from './EditContribuyenteModal';
-import { getContribuyentes } from "../services/getContribuyentes";
+import { getContribuyentes, deleteContribuyente } from "../services/getContribuyentes";
 
 export function ContribuyentesList({ onSelectContribuyente, refreshTrigger }) {
   const [contribuyentes, setContribuyentes] = useState([]);
@@ -46,9 +47,15 @@ export function ContribuyentesList({ onSelectContribuyente, refreshTrigger }) {
   };
 
   const handleDelete = async (id, nombre) => {
-    if (confirm(`¿Estás seguro de eliminar al contribuyente "${nombre}"?`)) {
-      alert("Delete simulado (aún no implementado en backend).");
-      fetchContribuyentes();
+    if (confirm(`¿Estás seguro de que quieres eliminar a "${nombre}"?`)) {
+      try {
+        await deleteContribuyente(id);
+        toast.success("Contribuyente eliminado correctamente");
+        fetchContribuyentes();
+      } catch (error) {
+        console.error(error);
+        toast.error("Error al eliminar el contribuyente");
+      }
     }
   };
 
@@ -157,7 +164,10 @@ export function ContribuyentesList({ onSelectContribuyente, refreshTrigger }) {
         <EditContribuyenteModal
           contribuyente={editingContribuyente}
           onClose={() => setEditingContribuyente(null)}
-          onSuccess={fetchContribuyentes}
+          onSuccess={() => {
+            setEditingContribuyente(null);
+            fetchContribuyentes();
+          }}
         />
       )}
     </>

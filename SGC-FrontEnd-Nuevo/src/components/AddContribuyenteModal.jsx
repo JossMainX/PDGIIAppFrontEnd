@@ -1,17 +1,15 @@
-import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import { getContribuyentesForView, updateContribuyente } from '../services/getContribuyentes';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { getContribuyentesForView, createContribuyente } from "../services/getContribuyentes";
+import { toast } from "sonner";
 
-export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
-
+export function AddContribuyenteModal({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
-    id: contribuyente.id,
-    nombre: contribuyente.nombre,
-    rncCedula: contribuyente.rncCedula ?? contribuyente.rnc ?? '',
-    tipoContribuyenteId: contribuyente.tipoContribuyenteId ?? '',
-    estatusContribuyenteId: contribuyente.estatusContribuyenteId ?? '',
-    provinciaId: contribuyente.provinciaId ?? ''
+    nombre: "",
+    rncCedula: "",
+    tipoContribuyenteId: "",
+    estatusContribuyenteId: "",
+    provinciaId: ""
   });
 
   const [tipos, setTipos] = useState([]);
@@ -28,23 +26,21 @@ export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
       .catch(err => console.error(err));
   }, []);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateContribuyente({
-        id: formData.id,
+      await createContribuyente({
         nombre: formData.nombre,
         rncCedula: formData.rncCedula,
         tipoContribuyenteId: parseInt(formData.tipoContribuyenteId),
         estatusContribuyenteId: parseInt(formData.estatusContribuyenteId),
         provinciaId: parseInt(formData.provinciaId)
       });
-      toast.success('Contribuyente actualizado correctamente');
+      toast.success("Contribuyente agregado correctamente");
       onSuccess();
     } catch (err) {
       console.error(err);
-      toast.error('Error al actualizar contribuyente');
+      toast.error("Error al crear contribuyente");
     }
   };
 
@@ -52,15 +48,11 @@ export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
       <div className="bg-gray-900 border border-emerald-900/30 rounded-lg shadow-2xl w-full max-w-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
-          <h3 className="text-white">Editar Contribuyente</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
+          <h3 className="text-white">Agregar Contribuyente</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
             <X className="w-6 h-6" />
           </button>
         </div>
-
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,18 +128,11 @@ export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-            >
+            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors">
               Cancelar
             </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg transition-colors"
-            >
-              Guardar Cambios
+            <button type="submit" className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg transition-colors">
+              Guardar
             </button>
           </div>
         </form>
