@@ -9,21 +9,23 @@ export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
     id: contribuyente.id,
     nombre: contribuyente.nombre,
     rncCedula: contribuyente.rncCedula ?? contribuyente.rnc ?? '',
-    tipoContribuyenteId: contribuyente.tipoContribuyenteId ?? '',
-    estatusContribuyenteId: contribuyente.estatusContribuyenteId ?? '',
-    provinciaId: contribuyente.provinciaId ?? ''
+    direccion: contribuyente.direccion ?? '',
+    telefono: contribuyente.telefono ?? '',
+    tipoContribuyenteId: contribuyente.tipoContribuyenteId?.toString() ?? '',
+    estatusContribuyenteId: contribuyente.estatusContribuyenteId?.toString() ?? '',
+    municipioId: contribuyente.municipioId?.toString() ?? ''
   });
 
   const [tipos, setTipos] = useState([]);
   const [estatuses, setEstatuses] = useState([]);
-  const [provincias, setProvincias] = useState([]);
+  const [municipios, setMunicipios] = useState([]);
 
   useEffect(() => {
     getContribuyentesForView()
-      .then(({ tipos, estatuses, provincias }) => {
+      .then(({ tipos, estatuses, municipios }) => {
         setTipos(tipos);
         setEstatuses(estatuses);
-        setProvincias(provincias);
+        setMunicipios(municipios);
       })
       .catch(err => console.error(err));
   }, []);
@@ -36,9 +38,11 @@ export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
         id: formData.id,
         nombre: formData.nombre,
         rncCedula: formData.rncCedula,
+        direccion: formData.direccion,
+        telefono: formData.telefono,
         tipoContribuyenteId: parseInt(formData.tipoContribuyenteId),
         estatusContribuyenteId: parseInt(formData.estatusContribuyenteId),
-        provinciaId: parseInt(formData.provinciaId)
+        municipioId: parseInt(formData.municipioId)
       });
       toast.success('Contribuyente actualizado correctamente');
       onSuccess();
@@ -46,6 +50,26 @@ export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
       console.error(err);
       toast.error('Error al actualizar contribuyente');
     }
+  };
+
+      const formatTelefono = (value) => {
+    let numbers = value.replace(/\D/g, "");
+    if (numbers.length > 3 && numbers.length <= 6) {
+      numbers = numbers.slice(0,3) + "-" + numbers.slice(3);
+    } else if (numbers.length > 6) {
+      numbers = numbers.slice(0,3) + "-" + numbers.slice(3,6) + "-" + numbers.slice(6,10);
+    }
+    return numbers;
+  };
+
+  const formatRncCedula = (value) => {
+    let numbers = value.replace(/\D/g, "");
+    if (numbers.length > 3 && numbers.length <= 10) {
+      numbers = numbers.slice(0,3) + "-" + numbers.slice(3);
+    } else if (numbers.length > 10) {
+      numbers = numbers.slice(0,3) + "-" + numbers.slice(3,10) + "-" + numbers.slice(10,11);
+    }
+    return numbers;
   };
 
   return (
@@ -67,20 +91,46 @@ export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
             <div>
               <label className="block text-gray-300 mb-2">Nombre</label>
               <input
-                type="text"
+                type="text" readOnly
                 value={formData.nombre}
+                onCopy={(e) => { e.preventDefault(); alert("No puedes copiar este valor"); }}
                 onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                 className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                 required
               />
             </div>
 
-            <div>
+            <div> 
               <label className="block text-gray-300 mb-2">RNC</label>
               <input
-                type="text"
+                type="text" readOnly
                 value={formData.rncCedula}
-                onChange={(e) => setFormData({ ...formData, rncCedula: e.target.value })}
+                onCopy={(e) => { e.preventDefault(); alert("No puedes copiar este valor"); }}
+                onChange={(e) => setFormData({ ...formData, rncCedula: formatRncCedula(e.target.value) })}
+                maxLength={13} // 3+7+1 + 2 guiones
+                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-300 mb-2">Direccion</label>
+              <input
+                type="text"
+                value={formData.direccion}
+                onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}
+                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-300 mb-2">Telefono</label>
+              <input
+                type="text"
+                value={formData.telefono}
+                onChange={(e) => setFormData({ ...formData, telefono: formatTelefono(e.target.value) })}
+                maxLength={12} // 10 digits + 2 dashes
                 className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                 required
               />
@@ -95,7 +145,7 @@ export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
                 style={{ colorScheme: 'dark' }}
                 required
               >
-                <option value="">Selecciona un tipo</option>
+                <option value="">Selecciona el tipo</option>
                 {tipos.map((tipo) => (
                   <option key={tipo.id} value={tipo.id}>{tipo.name}</option>
                 ))}
@@ -119,17 +169,18 @@ export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
             </div>
 
             <div>
-              <label className="block text-gray-300 mb-2">Provincia</label>
+              <label className="block text-gray-300 mb-2">Municipio</label>
               <select
-                value={formData.provinciaId}
-                onChange={(e) => setFormData({ ...formData, provinciaId: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                value={formData.municipioId}
+                onChange={(e) => setFormData({ ...formData, municipioId: e.target.value })}
+                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none 
+                focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                 style={{ colorScheme: 'dark' }}
                 required
               >
-                <option value="">Selecciona una provincia</option>
-                {provincias.map((prov) => (
-                  <option key={prov.id} value={prov.id}>{prov.name}</option>
+                <option value="">Selecciona un Municipio</option>
+                {municipios.map((m) => (
+                <option key={m.id} value={m.id}>{m.name}</option>
                 ))}
               </select>
             </div>
@@ -155,3 +206,4 @@ export function EditContribuyenteModal({ contribuyente, onClose, onSuccess }) {
     </div>
   );
 }
+

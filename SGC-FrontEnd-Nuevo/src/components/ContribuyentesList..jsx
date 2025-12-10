@@ -25,9 +25,11 @@ export function ContribuyentesList({ onSelectContribuyente, refreshTrigger }) {
         id: item.id,
         rnc: item.rncCedula ?? item.RncCedula,
         nombre: item.nombre ?? item.Nombre,
+        direccion: item.direccion ?? item.Direccion,
+        telefono: item.telefono ?? item.Telefono,
         tipo: item.tipoContribuyenteDesc ?? item.TipoContribuyenteDesc,
         estatus: item.estatusContribuyenteDesc ?? item.EstatusContribuyenteDesc,
-        provincia: item.provinciaDesc ?? item.ProvinciaDesc
+        municipio: item.municipioDesc ?? item.municipioDesc
     }));
 
 
@@ -76,9 +78,10 @@ export function ContribuyentesList({ onSelectContribuyente, refreshTrigger }) {
               <tr>
                 <th className="px-6 py-4 text-left text-gray-300">RNC</th>
                 <th className="px-6 py-4 text-left text-gray-300">Nombre</th>
+                <th className="px-6 py-4 text-left text-gray-300">Telefono</th>
                 <th className="px-6 py-4 text-left text-gray-300">Tipo</th>
                 <th className="px-6 py-4 text-left text-gray-300">Estatus</th>
-                <th className="px-6 py-4 text-left text-gray-300">Provincia</th>
+                <th className="px-6 py-4 text-left text-gray-300">Municipio</th>
                 <th className="px-6 py-4 text-left text-gray-300">Acciones</th>
               </tr>
             </thead>
@@ -101,9 +104,10 @@ export function ContribuyentesList({ onSelectContribuyente, refreshTrigger }) {
                     </button>
                   </td>
 
+                  <td className="px-6 py-4 text-gray-300">{c.telefono}</td>
                   <td className="px-6 py-4 text-gray-300">{c.tipo}</td>
                   <td className="px-6 py-4 text-gray-300">{c.estatus}</td>
-                  <td className="px-6 py-4 text-gray-300">{c.provincia}</td>
+                  <td className="px-6 py-4 text-gray-300">{c.municipio}</td>
 
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">

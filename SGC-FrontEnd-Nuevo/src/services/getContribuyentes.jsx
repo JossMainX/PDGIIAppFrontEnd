@@ -26,6 +26,31 @@ export async function getContribuyentes(pageNumber = 1) {
   };
 }
 
+export async function getContribuyenteById(id) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`https://localhost:7167/api/v1/Contribuyente/${id}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!res.ok) {
+    throw new Error("No se pudo obtener el contribuyente.");
+  }
+
+  const data = await res.json();
+
+  if (!data.success || !data.data) {
+    throw new Error("Respuesta inesperada del servidor.");
+  }
+
+  return data.data;
+}
+
+
 // services/contribuyentesService.js
 export async function getContribuyentesForView() {
   const token = localStorage.getItem("token");
@@ -47,7 +72,7 @@ export async function getContribuyentesForView() {
   // Eliminamos duplicados por ID usando Map
   const tiposMap = new Map();
   const estatusMap = new Map();
-  const provinciasMap = new Map();
+  const municipioMap = new Map();
 
   data.forEach(item => {
     if (item.tipoContribuyenteId && !tiposMap.has(item.tipoContribuyenteId)) {
@@ -56,15 +81,15 @@ export async function getContribuyentesForView() {
     if (item.estatusContribuyenteId && !estatusMap.has(item.estatusContribuyenteId)) {
       estatusMap.set(item.estatusContribuyenteId, { id: item.estatusContribuyenteId, name: item.estatusContribuyenteDesc });
     }
-    if (item.provinciaId && !provinciasMap.has(item.provinciaId)) {
-      provinciasMap.set(item.provinciaId, { id: item.provinciaId, name: item.provinciaDesc });
+    if (item.municipioId && !municipioMap.has(item.municipioId)) {
+      municipioMap.set(item.municipioId, { id: item.municipioId, name: item.municipioDesc });
     }
   });
 
   return {
     tipos: Array.from(tiposMap.values()),
     estatuses: Array.from(estatusMap.values()),
-    provincias: Array.from(provinciasMap.values()).sort((a, b) => b.name.localeCompare(a.name))
+    municipios: Array.from(municipioMap.values()).sort((a, b) => b.name.localeCompare(a.name))
   };
 }
 
