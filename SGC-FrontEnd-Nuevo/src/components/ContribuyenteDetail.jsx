@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Edit, Trash2, FileText, Calendar, DollarSign } from 'lucide-react';
+import { toast } from "sonner";
 import { AddComprobanteModal } from './AddComprobanteModal';
 import { EditComprobanteModal } from './EditComprobanteModal';
 import { getContribuyenteById } from "../services/getContribuyentes";
+import { getComprobanteFiscalById, deleteComprobanteFiscal } from '../services/getComprobanteFiscal';
 
 const generateMockComprobantes = () => {
   return Array.from({ length: 15 }, (_, i) => ({
@@ -61,16 +63,30 @@ export function ContribuyenteDetail({ contribuyenteId, onBack }) {
   };
 
   const fetchComprobantes = async () => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    setComprobantes(generateMockComprobantes());
+    try {
+      const listado = await getComprobanteFiscalById(contribuyenteId);
+      setComprobantes(listado); 
+    } catch (error) {
+      console.error("Error cargando comprobantes",error);
+      setComprobantes([]);
+    }
   };
 
   const handleDelete = async (id, folio) => {
-    if (confirm(`¿Estás seguro de eliminar el comprobante "${folio}"?`)) {
-      await new Promise(resolve => setTimeout(resolve, 300));
+  if (!confirm(`¿Estás seguro de eliminar el comprobante "${folio}"?`)) return;
+
+    try {
+      await deleteComprobanteFiscal(id);
+
+      toast.success("Comprobante fiscal eliminado correctamente");
+
       fetchComprobantes();
+      } catch (error) {
+      console.error("Error al eliminar el comprobante:", error);
+      toast.error("No se pudo eliminar el comprobante");
     }
   };
+
 
   const handleComprobanteAdded = () => {
     setShowAddModal(false);
@@ -170,16 +186,49 @@ export function ContribuyenteDetail({ contribuyenteId, onBack }) {
                 </div>
 
                 <div className="space-y-2 mb-4">
+                  {/* Fecha */}
                   <div className="flex items-center gap-2 text-gray-400">
                     <Calendar className="w-4 h-4" />
                     <span>{comprobante.fecha}</span>
                   </div>
+
+                  {/* Tipo */}
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <FileText className="w-4 h-4" />
+                    <span>Tipo: {comprobante.tipo}</span>
+                  </div>
+
+                  {/* Subtotal */}
                   <div className="flex items-center gap-2 text-gray-400">
                     <DollarSign className="w-4 h-4" />
-                    <span>Total: ${comprobante.total.toFixed(2)}</span>
+                     <span>Subtotal: ${comprobante.subtotal?.toFixed(2)}</span>
                   </div>
+
+                  {/* IVA */}
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <DollarSign className="w-4 h-4" />
+                    <span>IVA: ${comprobante.iva?.toFixed(2)}</span>
+                  </div>
+
+                  {/* Total */}
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <DollarSign className="w-4 h-4" />
+                    <span>Total: ${comprobante.total?.toFixed(2)}</span>
+                  </div>
+
+                  {/* Receptor */}
                   <div className="text-gray-400">
                     <span>Receptor: {comprobante.receptor}</span>
+                  </div>
+
+                  {/* RNC */}
+                  <div className="text-gray-400">
+                    <span>RNC: {comprobante.rnc}</span>
+                  </div>
+
+                  {/* Sucursal */}
+                  <div className="text-gray-400">
+                    <span>Sucursal: {comprobante.sucursal}</span>
                   </div>
                 </div>
 
