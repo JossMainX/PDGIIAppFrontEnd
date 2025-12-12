@@ -257,7 +257,7 @@ export function ContribuyenteDetail({ contribuyenteId, onBack }) {
 
       {showAddModal && (
         <AddComprobanteModal
-          contribuyenteId={contribuyenteId}
+          prefilledContribuyente={contribuyente}
           onClose={() => setShowAddModal(false)}
           onSuccess={handleComprobanteAdded}
         />

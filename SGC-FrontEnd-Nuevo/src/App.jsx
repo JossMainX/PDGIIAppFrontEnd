@@ -51,7 +51,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-emerald-950">
-      <Toaster position="top-right" />
+      <Toaster position="top-right" richColors />
       <Dashboard user={user} onLogout={handleLogout} />
     </div>
   );

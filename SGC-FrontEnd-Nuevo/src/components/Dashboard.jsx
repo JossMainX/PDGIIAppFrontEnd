@@ -4,21 +4,28 @@ import { ContribuyentesList } from './ContribuyentesList.';
 import { ContribuyenteDetail } from './ContribuyenteDetail';
 import { AddContribuyenteModal } from './AddContribuyenteModal';
 
-type User = {
-  id: string;
-  email: string;
-  name: string;
-};
-
-interface DashboardProps {
-  user: User;
-  onLogout: () => void;
-}
-
-export function Dashboard({ user, onLogout }: DashboardProps) {
-  const [selectedContribuyenteId, setSelectedContribuyenteId] = useState<string | null>(null);
+export function Dashboard({ user, onLogout }) {
+  const [selectedContribuyenteId, setSelectedContribuyenteId] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [filterNombre, setFilterNombre] = useState("");
+  const [filterRnc, setFilterRnc] = useState("");
+  const [filterMunicipio, setFilterMunicipio] = useState("");
+
+  const formatRncCedula = (value) => {
+    let numbers = value.replace(/\D/g, "");
+    if (numbers.length > 3 && numbers.length <= 10) {
+      numbers = numbers.slice(0, 3) + "-" + numbers.slice(3);
+    } else if (numbers.length > 10) {
+      numbers =
+        numbers.slice(0, 3) +
+        "-" +
+        numbers.slice(3, 10) +
+        "-" +
+        numbers.slice(10, 11);
+    }
+    return numbers;
+  };
 
   const handleContribuyenteAdded = () => {
     setShowAddModal(false);
@@ -71,10 +78,47 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
                 Agregar Contribuyente
               </button>
             </div>
+
+            <div className="bg-gray-900 border border-emerald-900/30 rounded-lg p-4 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-gray-300 text-sm mb-2">Nombre</label>
+                <input
+                  type="text"
+                  value={filterNombre}
+                  onChange={(e) => setFilterNombre(e.target.value)}
+                  placeholder="Ej: Juan Pérez"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-300 text-sm mb-2">RNC</label>
+                <input
+                  type="text"
+                  value={filterRnc}
+                  onChange={(e) => setFilterRnc(formatRncCedula(e.target.value))}
+                  maxLength={13}
+                  placeholder="001-1234567-8"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-300 text-sm mb-2">Municipio</label>
+                <input
+                  type="text"
+                  value={filterMunicipio}
+                  onChange={(e) => setFilterMunicipio(e.target.value)}
+                  placeholder="Ej: Santo Domingo"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white"
+                />
+              </div>
+            </div>
             
             <ContribuyentesList 
               onSelectContribuyente={setSelectedContribuyenteId}
               refreshTrigger={refreshTrigger}
+              filterNombre={filterNombre}
+              filterRnc={filterRnc}
+              filterMunicipio={filterMunicipio}
             />
           </>
         ) : (

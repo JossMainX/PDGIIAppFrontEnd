@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { EditContribuyenteModal } from './EditContribuyenteModal';
 import { getContribuyentes, deleteContribuyente } from "../services/getContribuyentes";
 
-export function ContribuyentesList({ onSelectContribuyente, refreshTrigger }) {
+export function ContribuyentesList({ onSelectContribuyente, refreshTrigger, filterNombre = "", filterRnc = "", filterMunicipio = "" }) {
   const [contribuyentes, setContribuyentes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(99);
@@ -28,8 +28,11 @@ export function ContribuyentesList({ onSelectContribuyente, refreshTrigger }) {
         direccion: item.direccion ?? item.Direccion,
         telefono: item.telefono ?? item.Telefono,
         tipo: item.tipoContribuyenteDesc ?? item.TipoContribuyenteDesc,
+        tipoContribuyenteId: item.tipoContribuyenteId ?? item.TipoContribuyenteId,
         estatus: item.estatusContribuyenteDesc ?? item.EstatusContribuyenteDesc,
-        municipio: item.municipioDesc ?? item.municipioDesc
+        estatusContribuyenteId: item.estatusContribuyenteId ?? item.EstatusContribuyenteId,
+        municipio: item.municipioDesc ?? item.MunicipioDesc,
+        municipioId: item.municipioId ?? item.MunicipioId
     }));
 
 
@@ -87,7 +90,15 @@ export function ContribuyentesList({ onSelectContribuyente, refreshTrigger }) {
             </thead>
 
             <tbody className="divide-y divide-gray-800">
-              {contribuyentes.map((c) => (
+              {contribuyentes
+                .filter((c) => {
+                  const matchNombre = !filterNombre || c.nombre?.toLowerCase().includes(filterNombre.toLowerCase());
+                  const clean = (val) => (val || "").replace(/\D/g, "");
+                  const matchRnc = !filterRnc || clean(c.rnc).includes(clean(filterRnc));
+                  const matchMunicipio = !filterMunicipio || c.municipio?.toLowerCase().includes(filterMunicipio.toLowerCase());
+                  return matchNombre && matchRnc && matchMunicipio;
+                })
+                .map((c) => (
                 <tr 
                   key={c.id}
                   className="hover:bg-gray-800/50 transition-colors"
